@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Code Examples &mdash; clara-zmq 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="clara-zmq 0.1 documentation" href="index.html" />
+    <link rel="next" title="Hands On" href="handson.html" />
+    <link rel="prev" title="Service Threading" href="threading.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="handson.html" title="Hands On"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="threading.html" title="Service Threading"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="code-examples">
+<h1>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h1>
+<p>Examples presented in this section of the document are in Python. Document will be expanded to show Java examples soon.
+.. _monitor_example:</p>
+<div class="section" id="discover-a-service">
+<h2>Discover a service<a class="headerlink" href="#discover-a-service" title="Permalink to this headline">¶</a></h2>
+<p>This example shows how to contact <em>Registrar</em> service and request particular service description
+by specifying the canonical name of a service, requesting the canonical name of an registered service by specifying
+the engine name of a service, list of all services deployed in a specified service container canonical
+name, and asking the names of all services running is specified DPE/host.</p>
+<div class="highlight-c"><div class="highlight"><pre>from core.xMsgUtil import xMsgUtil
+from src.base.OrchestratorBase import OrchestratorBase
+
+__author__ = &#39;gurjyan&#39;
+
+
+class ServiceFinder(OrchestratorBase):
+    def __init__(self):
+        OrchestratorBase.__init__(self)
+
+    def start(self):
+
+        while True:
+            xMsgUtil.sleep(1)
+            print &quot;acceptable commands: getServiceByName, getServiceByEngineName, &quot; \
+                  &quot;getServicesByContainer, getServicesByHost&quot;
+            cmd = raw_input(&quot;enter a command:&quot;)
+            if cmd == &quot;getServiceByName&quot;:
+                service_name = raw_input(&quot;what is the canonical name of the service?&quot;)
+                lr_data = self.find_service(service_name)
+                print lr_data[0]
+
+            elif cmd == &quot;getServiceByEngineName&quot;:
+                engine_name = raw_input(&quot;what is the service engine name?&quot;)
+                lr_data = self.get_service_by_engine(engine_name)
+                for d in lr_data:
+                    print d
+
+            elif cmd == &quot;getServicesByContainer&quot;:
+                container_name = raw_input(&quot;what is the canonical name of the container?&quot;)
+                lr_data = self.get_service_by_container(container_name)
+                for d in lr_data:
+                    print d
+
+            elif cmd == &quot;getServicesByHost&quot;:
+                host_name = raw_input(&quot;what is the IP of the host?&quot;)
+                lr_data = self.get_service_by_host(host_name)
+                for d in lr_data:
+                    print d
+
+def main():
+    o = ServiceFinder()
+    o.start()
+
+
+if __name__ == &#39;__main__&#39;:
+    main()
+</pre></div>
+</div>
+</div>
+<div class="section" id="simple-application-design">
+<span id="orchestrator-example"></span><h2>Simple application design<a class="headerlink" href="#simple-application-design" title="Permalink to this headline">¶</a></h2>
+<p>This orchestrator uses deployed engine names to construct and start service based application. It assumes that all
+services are running on a local DPE and that the name of a service container is known. This example is not
+using CLARA lookup and discovery services.</p>
+<p>Input parameters to the constructor of this orchestrator will define the name engine name of the initiator service,
+i.e. the first service in the composition, the container name where all the services of the composition are deployed,
+data size of the byte array that will be sent to the first service, and the string of the CLARA application composition.
+Using base class methods orchestrator substitutes engine names in the user provided composition with proper
+canonical names. Then it defines the CLARA transient data object by filling appropriate fields,
+including application composition string. After transient data is created it sends to the first service
+in the composition chain. Now the application is started and service execution schema will follow data flow
+diagram defined and presented to each service in the composition as part of the request. Each service receiving the
+request will know where the from the request is coming and where it should direct the result of its engine execution.
+Thus entire service based application algorithm is packed in the composition string of the transient data object and
+is presented to each service. It is important tp mention that parsing (compiling) of the composition is done only once
+and will be recompiled only if the composition is changed. Due to the fact that the same service can be part of one or
+many applications (with different compositions) the service will parse the composition string in case of a new
+application request. This behaviour must be considered during an application performance optimization studies.</p>
+<div class="highlight-c"><div class="highlight"><pre>import sys
+from core.xMsgConstants import xMsgConstants
+from data import xMsgData_pb2
+from src.base.OrchestratorBase import OrchestratorBase
+
+
+__author__ = &#39;gurjyan&#39;
+
+
+class PatternTester(OrchestratorBase):
+    &quot;&quot;&quot;
+    This orchestrator is design to test Clara patterns.
+    It assumes that services are deployed on the local DPE
+
+    constructor accepts 4 parameters
+
+        Note: all services are assumed to run on a local
+              host and have the same container name
+
+        1) the name of the first service engine in the service chain
+        2) data size in bytes
+        3) actual application composition,
+           e.g. s1+s2+s3+s4 or s1,s2,s3+s4
+           Note: using engine names only. Actual service names
+                 will constructed using the local host and defined
+                 container name.
+    &quot;&quot;&quot;
+    initiator_engine = xMsgConstants.UNDEFINED
+    data_size = 0
+    composition = xMsgConstants.UNDEFINED
+
+    def __init__(self, name, data_size, composition):
+        OrchestratorBase.__init__(self)
+        self.initiator_engine = name
+        self.data_size = int(data_size)
+        self.composition = composition
+
+    def start(self):
+
+        assert isinstance(self.initiator_engine, str)
+
+        l = self.get_service_by_engine(self.initiator_engine)
+
+        if l[0] == xMsgConstants.NO_RESULT:
+            print &quot;Engine = &quot; + self.initiator_engine + &quot; is not registered as a service&quot;
+            return
+        else:
+            service_1 = l[0]
+
+        # recreate composition string by substituting engine
+        # names with proper service canonical names
+        _cmd = self.engine_to_composition(self.composition)
+
+        # define transient data
+        tr = xMsgData_pb2.Data()
+        tr.sender = self.get_my_name()
+        tr.id = 1
+        tr.action = xMsgData_pb2.Data.EXECUTE
+        tr.composition = _cmd
+        # creating a byte buffer using a character as a byte
+        tr.BYTES = &#39;v&#39; * self.data_size
+        # tr.data = str(randint(1, 100))
+        tr.dataType = xMsgData_pb2.Data.T_BYTES
+        tr.dataGenerationStatus = xMsgData_pb2.Data.INFO
+
+        print &quot;sending request to &quot; + service_1.name + &quot; with the payload: \n&quot;
+        print tr
+
+        self.send(service_1.name, tr)
+
+
+def main(name, d_size, cmd):
+    orc = PatternTester(name, d_size, cmd)
+    orc.start()
+
+
+if __name__ == &#39;__main__&#39;:
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
+</pre></div>
+</div>
+</div>
+<div class="section" id="sentence-builder">
+<span id="sentence-example"></span><h2>Sentence builder<a class="headerlink" href="#sentence-builder" title="Permalink to this headline">¶</a></h2>
+<p>This example is a little bit more entertaining. There are 6 service involved in this exercise. The first 4 services
+play the role of a data-source (F1-F4). At the configure request these services open and read into the memory the content
+of a requested/given file, containing some of letters of a given sentence that wae spread between 4 files in a round robin fashion.
+Here is the example of a service engine, implementing <em>configure</em> and <em>execute</em> methods of the  Clara engine abstract
+class.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">def</span> <span class="n">configure</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">print</span> <span class="s">&quot;GOT CONFIGURE REQUEST&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">str</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">data</span><span class="p">),</span> <span class="s">&quot;r+b&quot;</span><span class="p">)</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">f_content</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">readline</span><span class="p">()</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">c_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">def</span> <span class="n">execute</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">print</span> <span class="s">&quot;INPUT SERVICE .....&gt; &quot;</span> <span class="o">+</span> <span class="n">x</span><span class="p">.</span><span class="n">sender</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="n">f_content</span>
+    <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">c_count</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">f_content</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">x</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">f_content</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">c_count</span><span class="p">]</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">c_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="nl">else:</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">c_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">x</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="s">&quot; &quot;</span>
+    <span class="n">print</span> <span class="s">&quot;SENDING DATA = &quot;</span><span class="o">+</span><span class="n">x</span><span class="p">.</span><span class="n">data</span>
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+<p>These data-source services will send their data letter by letter to the the event builder service, that will
+recover sentence 4 letter at a time, and send the subset of the build sentence to the recorder service (R).
+Below is the diagram of the sentence builder application. Note that event-builder (EG) service inputs are
+logically ANDed, i.e. EG engine will be execute only if all the inputs are received.</p>
+<blockquote>
+<div><div class="align-center figure">
+<a class="reference internal image-reference" href="_images/Slide08.jpg"><img alt="alternate text" src="_images/Slide08.jpg" style="width: 600px; height: 400px;" /></a>
+</div>
+</div></blockquote>
+<p>Since EB is a multi-input gate where inputs are logically ANDed, engine of this service must implement
+<em>execute_group</em> abstract method of the CLARA engine class.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">def</span> <span class="n">execute_group</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">print</span> <span class="s">&quot;MULTI-INPUT DATA .....&gt; &quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="n">in</span> <span class="n">x</span><span class="o">:</span>
+        <span class="k">if</span> <span class="s">&quot;F1&quot;</span> <span class="n">in</span> <span class="n">k</span><span class="p">.</span><span class="n">sender</span><span class="o">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">elif</span> <span class="s">&quot;F2&quot;</span> <span class="n">in</span> <span class="n">k</span><span class="p">.</span><span class="n">sender</span><span class="o">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">elif</span> <span class="s">&quot;F3&quot;</span> <span class="n">in</span> <span class="n">k</span><span class="p">.</span><span class="n">sender</span><span class="o">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">elif</span> <span class="s">&quot;F4&quot;</span> <span class="n">in</span> <span class="n">k</span><span class="p">.</span><span class="n">sender</span><span class="o">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">.</span><span class="n">data</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="n">in</span> <span class="n">d</span><span class="o">:</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">y</span>
+    <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">data</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Data recorder service does very little by simply printing the received data.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">def</span> <span class="n">execute</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">:</span>
+   <span class="n">self</span><span class="p">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">result</span> <span class="o">+</span> <span class="n">x</span><span class="p">.</span><span class="n">data</span>
+   <span class="n">print</span> <span class="n">self</span><span class="p">.</span><span class="n">result</span>
+   <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+<p>And finally the orchestrator code below that first asks Discovery and Registry services to locate services
+of interest. Here orchestrator checks only starting services, but in reality it should check
+all service in the composition.Note that CLARA canonical name of a service (containing complete address of
+a service) will be returned to the orchestrator, in the case services were properly registered with the platform.
+And the rest is simply creating CLARA transient data object (lines 47-55) by setting composition field = command-line
+provided string of the composition: F1,F2,F3,F4+&amp;EB+R+F1,F2,F3,F4</p>
+<div class="highlight-c"><div class="highlight"><pre>import sys
+from core.xMsgConstants import xMsgConstants
+from core.xMsgUtil import xMsgUtil
+from data import xMsgData_pb2
+from src.base.OrchestratorBase import OrchestratorBase
+
+__author__ = &#39;gurjyan&#39;
+
+
+class Composer(OrchestratorBase):
+
+    engine1 = xMsgConstants.UNDEFINED
+    engine2 = xMsgConstants.UNDEFINED
+    engine3 = xMsgConstants.UNDEFINED
+    engine4 = xMsgConstants.UNDEFINED
+    composition = xMsgConstants.UNDEFINED
+
+    def __init__(self, e1, e2, e3, e4, composition):
+        OrchestratorBase.__init__(self)
+        self.engine1 = e1
+        self.engine2 = e2
+        self.engine3 = e3
+        self.engine4 = e4
+        self.composition = composition
+
+    def start(self):
+
+        # create service canonical name from the engine
+        l = self.get_service_by_engine(self.engine1)
+        if l[0] == xMsgConstants.NO_RESULT:
+            print &quot;Engine = &quot; + self.engine1 + &quot; is not registered as a service&quot;
+            return
+        else:
+            service_1 = l[0]
+
+        l = self.get_service_by_engine(self.engine2)
+        if l[0] == xMsgConstants.NO_RESULT:
+            print &quot;Engine = &quot; + self.engine2 + &quot; is not registered as a service&quot;
+            return
+        else:
+            service_2 = l[0]
+
+        l = self.get_service_by_engine(self.engine3)
+        if l[0] == xMsgConstants.NO_RESULT:
+            print &quot;Engine = &quot; + self.engine3 + &quot; is not registered as a service&quot;
+            return
+        else:
+            service_3 = l[0]
+
+        l = self.get_service_by_engine(self.engine4)
+        if l[0] == xMsgConstants.NO_RESULT:
+            print &quot;Engine = &quot; + self.engine4 + &quot; is not registered as a service&quot;
+            return
+        else:
+            service_4 = l[0]
+
+        # recreate composition string by substituting engine
+        # names with proper service canonical names
+        _cmd = self.engine_to_composition(self.composition)
+
+        # define transient data
+        tr = xMsgData_pb2.Data()
+        tr.sender = self.get_my_name()
+        tr.id = 1
+        tr.action = xMsgData_pb2.Data.EXECUTE
+        tr.composition = _cmd
+        # creating a byte buffer using a character as a byte
+        tr.STRING = &#39;v&#39;
+        tr.dataType = xMsgData_pb2.Data.T_STRING
+        tr.dataGenerationStatus = xMsgData_pb2.Data.INFO
+
+        print &quot;sending request to &quot; + service_1.name + &quot; with the payload: \n&quot; + str(tr)
+        self.send(service_1.name, tr)
+        xMsgUtil.sleep(0.01)
+        print &quot;sending request to &quot; + service_2.name + &quot; with the payload: \n&quot; + str(tr)
+        self.send(service_2.name, tr)
+        xMsgUtil.sleep(0.01)
+        print &quot;sending request to &quot; + service_3.name + &quot; with the payload: \n&quot; + str(tr)
+        self.send(service_3.name, tr)
+        xMsgUtil.sleep(0.01)
+        print &quot;sending request to &quot; + service_4.name + &quot; with the payload: \n&quot; + str(tr)
+        self.send(service_4.name, tr)
+
+
+def main(e1, e2, e3, e4, cmd):
+    orc = Composer(e1, e2, e3, e4, cmd)
+    orc.start()
+
+if __name__ == &#39;__main__&#39;:
+    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Code Examples</a><ul>
+<li><a class="reference internal" href="#discover-a-service">Discover a service</a></li>
+<li><a class="reference internal" href="#simple-application-design">Simple application design</a></li>
+<li><a class="reference internal" href="#sentence-builder">Sentence builder</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="threading.html"
+                        title="previous chapter">Service Threading</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="handson.html"
+                        title="next chapter">Hands On</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/examples.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="handson.html" title="Hands On"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="threading.html" title="Service Threading"
+             >previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, V. Gyurjyan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

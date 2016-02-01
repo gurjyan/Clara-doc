@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hands On &mdash; clara-zmq 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="clara-zmq 0.1 documentation" href="index.html" />
+    <link rel="next" title="Clara related publications" href="publications.html" />
+    <link rel="prev" title="Code Examples" href="examples.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="publications.html" title="Clara related publications"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Code Examples"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="hands-on">
+<h1>Hands On<a class="headerlink" href="#hands-on" title="Permalink to this headline">¶</a></h1>
+<p>Hands on section is for CLARA Python binding. Here we assume that you have successfully installed zmq python module and
+have a proper PYTHONPATH setup, pointing to Clara-p.zmq package.</p>
+<p>We suggest using easy_install, perhaps in connection with a Python virtual environment. You need to install the
+libzmq-dev package so that the Python package compiles.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libzmq</span><span class="o">-</span><span class="n">dev</span>
+<span class="n">sudo</span> <span class="n">easy_install</span> <span class="n">pyzmq</span>
+</pre></div>
+</div>
+<p>Google&#8217;s Protobuf is used to define and serialize/deserialization CLARA transient data envelope. You do not have
+to install Protobuf (open source) in order to use CLARA, unless you would like to change CLARA transient data format
+(not recommended, since it will require substantial rewrite of the existing code.</p>
+<p>These are two technologies used in the framework (all are open source).</p>
+<p>The only environmental variable required to be set is $PCLARA_HOME, pointing to the home directory of the pClara
+installation. In you .bashrc or any other shell startup scrip if you set $PATH pointing also to $PCLARA_HOME/script/unix
+then you can use package presented shell scripts to start/stop CLARA components. All startup scripts support <em>-h</em> or
+<em>-help</em> option to print synopsis of the scripts.</p>
+<div class="section" id="starting-a-dpe">
+<span id="starting-dpe"></span><h2>Starting a DPE<a class="headerlink" href="#starting-a-dpe" title="Permalink to this headline">¶</a></h2>
+<p>To run a DPE type:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_dpe</span>
+<span class="o">================================</span>
+           <span class="n">CLARA</span> <span class="n">Dpe</span>
+<span class="o">================================</span>
+<span class="n">lang</span> <span class="o">=</span> <span class="n">Python</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Fri</span> <span class="n">Jan</span> <span class="mi">23</span> <span class="mi">14</span><span class="o">:</span><span class="mi">37</span><span class="o">:</span><span class="mi">39</span> <span class="mi">2015</span>
+<span class="n">host</span> <span class="o">=</span> <span class="mf">129.57.81.247</span>
+<span class="o">================================</span>
+<span class="nl">Info:</span> <span class="n">xMsg</span> <span class="n">local</span> <span class="n">registration</span> <span class="n">and</span> <span class="n">discovery</span> <span class="n">server</span> <span class="n">is</span> <span class="n">started</span>
+<span class="nl">Info:</span> <span class="n">Running</span> <span class="n">xMsg</span> <span class="n">proxy</span> <span class="n">server</span> <span class="n">on</span> <span class="n">the</span> <span class="n">localhost</span><span class="p">...</span>
+</pre></div>
+</div>
+<p>DPE will start it&#8217;s local proxy and Registrar service.</p>
+</div>
+<div class="section" id="starting-a-service">
+<span id="starting-service"></span><h2>Starting a service<a class="headerlink" href="#starting-a-service" title="Permalink to this headline">¶</a></h2>
+<p>To deploy a service we run a service container and specify the service engine class name. Not that service engine class
+must be accessible through PYTHONPATH variable in order the container to be able to dynamically load the engine
+class.  Service container needs to parameters for successful service deployment:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>the module name containing the engine class (Python implementation specific)</li>
+<li>the name of the container and</li>
+<li>the service engine class name</li>
+<li>object pool size</li>
+</ol>
+</div></blockquote>
+<p>Here is the synopsis of the p_service script:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_service</span> <span class="o">-</span><span class="n">help</span>
+
+<span class="n">Starts</span> <span class="n">CLARA</span> <span class="n">service</span> <span class="p">(</span><span class="n">python</span> <span class="n">binding</span><span class="p">)</span>
+<span class="o">-------------------------------------</span>
+<span class="nl">synopsis:</span>
+<span class="n">p_service</span> <span class="p">[</span><span class="n">service</span> <span class="n">engine</span> <span class="n">module</span><span class="p">]</span> <span class="p">[</span><span class="n">container</span><span class="p">]</span> <span class="p">[</span><span class="n">service</span> <span class="n">class</span><span class="p">]</span> <span class="p">[</span><span class="n">object</span> <span class="n">pool</span> <span class="n">size</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>An example for the service deployment with the package name <em>ServiceEngine</em> , engine class name = <em>F1</em>, and the
+container name = <em>abc</em> is shown below:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_service</span> <span class="n">ServiceEngine</span> <span class="n">abc</span> <span class="n">F1</span> <span class="mi">3</span>
+<span class="n">registering</span> <span class="n">with</span> <span class="n">registrar</span> <span class="n">and</span> <span class="n">discovery</span> <span class="n">services</span><span class="p">...</span>
+</pre></div>
+</div>
+<p>After service is deployed the first thing it does is registering it&#8217;s services wit the Registrar and Discovery services
+Service container console will print a message about the status of the registration.
+Note the canonical
+name of the service that successfully completed the registration process.
+Platform and DPE consoles will print Registrar service messages, informing
+the incoming service registration request:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_dpe</span>
+<span class="o">================================</span>
+           <span class="n">CLARA</span> <span class="n">Dpe</span>
+<span class="o">================================</span>
+<span class="n">lang</span> <span class="o">=</span> <span class="n">Python</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">Fri</span> <span class="n">Jan</span> <span class="mi">23</span> <span class="mi">14</span><span class="o">:</span><span class="mi">37</span><span class="o">:</span><span class="mi">39</span> <span class="mi">2015</span>
+<span class="n">host</span> <span class="o">=</span> <span class="mf">129.57.81.247</span>
+<span class="o">================================</span>
+<span class="nl">Info:</span> <span class="n">xMsg</span> <span class="n">local</span> <span class="n">registration</span> <span class="n">and</span> <span class="n">discovery</span> <span class="n">server</span> <span class="n">is</span> <span class="n">started</span>
+<span class="nl">Info:</span> <span class="n">Running</span> <span class="n">xMsg</span> <span class="n">proxy</span> <span class="n">server</span> <span class="n">on</span> <span class="n">the</span> <span class="n">localhost</span><span class="p">...</span>
+<span class="n">Received</span> <span class="n">a</span> <span class="n">request</span> <span class="n">from</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">Engine1</span> <span class="n">to</span> <span class="n">registerSubscriber</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-discover-service-example">
+<span id="monitor-example2"></span><h2>Running discover service example<a class="headerlink" href="#running-discover-service-example" title="Permalink to this headline">¶</a></h2>
+<p>Now let us run DiscoverService example described in the Examples section of this documentation.
+Change directory to $PCLARA_HOME/example/orchestrators, and run DiscoverService.py.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_finder</span>
+<span class="n">acceptable</span> <span class="n">commands</span><span class="o">:</span> <span class="n">getServiceByName</span><span class="p">,</span> <span class="n">getServiceByEngineName</span><span class="p">,</span> <span class="n">getServicesByContainer</span><span class="p">,</span> <span class="n">getServicesByHost</span><span class="p">,</span> <span class="n">listServices</span>
+<span class="n">enter</span> <span class="n">a</span> <span class="n">command</span><span class="o">:</span>
+</pre></div>
+</div>
+<p>Let us choose the first command, requesting the description of a service, followed by the definition of
+the canonical name of the service of interest.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_finder</span>
+<span class="n">acceptable</span> <span class="n">commands</span><span class="o">:</span> <span class="n">getServiceByName</span><span class="p">,</span> <span class="n">getServiceByEngineName</span><span class="p">,</span> <span class="n">getServicesByContainer</span><span class="p">,</span> <span class="n">getServicesByHost</span>
+<span class="n">enter</span> <span class="n">a</span> <span class="n">command</span><span class="o">:</span><span class="n">getServiceByName</span>
+<span class="n">what</span> <span class="n">is</span> <span class="n">the</span> <span class="n">canonical</span> <span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">service</span><span class="o">?</span><span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">F1</span>
+<span class="o">====</span> <span class="n">DISCOVER</span> <span class="n">SERVICE</span> <span class="n">RESULT</span> <span class="o">====</span>
+<span class="n">F1</span> <span class="n">description</span>
+<span class="o">=================================</span>
+<span class="n">acceptable</span> <span class="n">commands</span><span class="o">:</span> <span class="n">getServiceByName</span><span class="p">,</span> <span class="n">getServiceByEngineName</span><span class="p">,</span> <span class="n">getServicesByContainer</span><span class="p">,</span> <span class="n">getServicesByHost</span>
+<span class="n">enter</span> <span class="n">a</span> <span class="n">command</span><span class="o">:</span>
+</pre></div>
+</div>
+<p>Not the result, i.e. the service description string set by the service engine developer
+(see CLARA <em>ACEngine</em> abstract class <em>get_description</em> method). Service
+engine examples can be found in the  Clara-p.zm1/example/engine/ServiceEngine.py file.</p>
+</div>
+<div class="section" id="hello-world-application">
+<span id="orchestrator-example2"></span><h2>Hello world application<a class="headerlink" href="#hello-world-application" title="Permalink to this headline">¶</a></h2>
+<p>It has become customary when learning a new programming language or testing an unfamiliar programming environment to
+write a &#8220;Hello world&#8221; program. So, without braking the tradition let us create our first CLARA application that will
+greet us. However, instead of writing a service that generates the &#8220;Hello world&#8221; string at the request, we will present
+something more complex and interesting. Let us shovel letters of our string of greetings in 4 different files.
+To decompose a string and distribute letters of a string in 4 different files we will use a program presented within
+the CLARA package, called <em>Decomposer.py</em>.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">p_decompose</span> <span class="s">&quot;A warm greetings from CLARA&quot;</span>
+</pre></div>
+</div>
+<p>As a result of this execution 4 files will be created in $PCLARA_HOME/example/engines/Data directory, with the
+following contents:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">more</span> <span class="n">d1</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">Arri</span> <span class="n">mA</span>
+
+<span class="o">&gt;</span><span class="n">more</span> <span class="n">d2</span><span class="p">.</span><span class="n">txt</span>
+ <span class="n">menf</span> <span class="n">R</span>
+
+<span class="o">&gt;</span><span class="n">more</span> <span class="n">d3</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">w</span> <span class="n">egrCA</span>
+
+<span class="o">&gt;</span><span class="n">more</span> <span class="n">d4</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">agtsoL</span>
+</pre></div>
+</div>
+<p>Now let us create a service based application that will reconstruct our initial string of greetings,
+i.e. &#8220;A warm greetings from CLARA&#8221;. For that purpose we will create 6 services:</p>
+<blockquote>
+<div><ul class="simple">
+<li>4 services: F1,F2,F3,F4 opening and reading 4 data files (d1.txt, d2.txt, d3.txt and d4.txt) respectively. Note that F1-F4 services are generic and will be configured at the <em>configure</em> request of the orchestrator, telling each of them what file they have to open and serve one letter at time for every service request.</li>
+<li>Sentence builder service: EB, that will receive letters from each of the data services and will construct a word.</li>
+<li>Recorder service: R that will simple receive the 4 letter word from the EB service and will print it on a screen.</li>
+</ul>
+</div></blockquote>
+<p>Recall example code and above described application diagram from the section <strong>Examples</strong> of this document. Here are steps to deploy and run our custom <em>greetings</em> application.</p>
+<p>Steps for starting the platform, the dpe and the service are described above. So, we have to start all 6 services first. After services are started and they register their addresses and service description data with the registration and discovery services we execute an orchestrator that will send configuration request to data and recording services of the application.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="o">&gt;</span><span class="n">p_configure</span> <span class="n">F1</span> <span class="n">F2</span> <span class="n">F3</span> <span class="n">F4</span> <span class="n">R</span>
+<span class="n">sending</span> <span class="n">configure</span> <span class="n">request</span> <span class="n">to</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">F1</span> <span class="n">with</span> <span class="n">the</span> <span class="n">payload</span><span class="o">:</span>
+<span class="nl">status:</span> <span class="n">INFO</span>
+<span class="nl">data:</span> <span class="s">&quot;/Users/gurjyan/Devel/Clara/Clara-p.zmq.0.2/example/engines/Data/d1.txt&quot;</span>
+<span class="nl">dataType:</span> <span class="n">STRING</span>
+<span class="nl">request_id:</span> <span class="mi">1</span>
+<span class="nl">sender:</span> <span class="s">&quot;Orchestrator_46&quot;</span>
+<span class="nl">composition:</span> <span class="s">&quot;&quot;</span>
+<span class="nl">action:</span> <span class="n">CONFIGURE</span>
+
+<span class="n">sending</span> <span class="n">configure</span> <span class="n">request</span> <span class="n">to</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">F2</span> <span class="n">with</span> <span class="n">the</span> <span class="n">payload</span><span class="o">:</span>
+<span class="nl">status:</span> <span class="n">INFO</span>
+<span class="nl">data:</span> <span class="s">&quot;/Users/gurjyan/Devel/Clara/Clara-p.zmq.0.2/example/engines/Data/d2.txt&quot;</span>
+<span class="nl">dataType:</span> <span class="n">STRING</span>
+<span class="nl">request_id:</span> <span class="mi">1</span>
+<span class="nl">sender:</span> <span class="s">&quot;Orchestrator_46&quot;</span>
+<span class="nl">composition:</span> <span class="s">&quot;&quot;</span>
+<span class="nl">action:</span> <span class="n">CONFIGURE</span>
+
+<span class="n">sending</span> <span class="n">configure</span> <span class="n">request</span> <span class="n">to</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">F3</span> <span class="n">with</span> <span class="n">the</span> <span class="n">payload</span><span class="o">:</span>
+<span class="nl">status:</span> <span class="n">INFO</span>
+<span class="nl">data:</span> <span class="s">&quot;/Users/gurjyan/Devel/Clara/Clara-p.zmq.0.2/example/engines/Data/d3.txt&quot;</span>
+<span class="nl">dataType:</span> <span class="n">STRING</span>
+<span class="nl">request_id:</span> <span class="mi">1</span>
+<span class="nl">sender:</span> <span class="s">&quot;Orchestrator_46&quot;</span>
+<span class="nl">composition:</span> <span class="s">&quot;&quot;</span>
+<span class="nl">action:</span> <span class="n">CONFIGURE</span>
+
+<span class="n">sending</span> <span class="n">configure</span> <span class="n">request</span> <span class="n">to</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">F4</span> <span class="n">with</span> <span class="n">the</span> <span class="n">payload</span><span class="o">:</span>
+<span class="nl">status:</span> <span class="n">INFO</span>
+<span class="nl">data:</span> <span class="s">&quot;/Users/gurjyan/Devel/Clara/Clara-p.zmq.0.2/example/engines/Data/d4.txt&quot;</span>
+<span class="nl">dataType:</span> <span class="n">STRING</span>
+<span class="nl">request_id:</span> <span class="mi">1</span>
+<span class="nl">sender:</span> <span class="s">&quot;Orchestrator_46&quot;</span>
+<span class="nl">composition:</span> <span class="s">&quot;&quot;</span>
+<span class="nl">action:</span> <span class="n">CONFIGURE</span>
+
+<span class="n">sending</span> <span class="n">configure</span> <span class="n">request</span> <span class="n">to</span> <span class="mf">129.57.81.247</span><span class="o">:</span><span class="n">abc</span><span class="o">:</span><span class="n">R</span> <span class="n">with</span> <span class="n">the</span> <span class="n">payload</span><span class="o">:</span>
+<span class="nl">status:</span> <span class="n">INFO</span>
+<span class="nl">data:</span> <span class="s">&quot;/Users/gurjyan/Devel/Clara/Clara-p.zmq.0.2/example/engines/Data/d4.txt&quot;</span>
+<span class="nl">dataType:</span> <span class="n">STRING</span>
+<span class="nl">request_id:</span> <span class="mi">1</span>
+<span class="nl">sender:</span> <span class="s">&quot;Orchestrator_46&quot;</span>
+<span class="nl">composition:</span> <span class="s">&quot;&quot;</span>
+<span class="nl">action:</span> <span class="n">CONFIGURE</span>
+</pre></div>
+</div>
+<p>For clarity reason orchestrator prints CLARA transient data object, sent to data services. In these printouts you can see that services receive <em>configure</em> request indicating the file name to be processed.
+Now if you check the consoles of the data services you should see printouts indicating that services were configured. Note that configuration confirmation message is printed 3 times, indicating that all the objects in the service container object pool got configured.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">GOT</span> <span class="n">CONFIGURE</span> <span class="n">REQUEST</span>
+<span class="kt">FILE</span> <span class="n">CONTENT</span> <span class="o">=</span> <span class="n">Arri</span> <span class="n">mA</span>
+
+<span class="n">GOT</span> <span class="n">CONFIGURE</span> <span class="n">REQUEST</span>
+<span class="kt">FILE</span> <span class="n">CONTENT</span> <span class="o">=</span> <span class="n">Arri</span> <span class="n">mA</span>
+
+<span class="n">GOT</span> <span class="n">CONFIGURE</span> <span class="n">REQUEST</span>
+<span class="kt">FILE</span> <span class="n">CONTENT</span> <span class="o">=</span> <span class="n">Arri</span> <span class="n">mA</span>
+</pre></div>
+</div>
+<p>After services are configured we can start or application main orchestrator by passing application design composition:</p>
+<div class="highlight-c"><div class="highlight"><pre>&gt;p_compose F1 F2 F3 F4 F1,F2,F3,F4+\&amp;EB+R+F1,F2,F3,F4
+</pre></div>
+</div>
+<p>Note the application composition string, where we have to properly escape the <em>&amp;</em> indicating that 4 inputs of the EB service are logically ANDed.
+We started our application that will run for ever as we require in our composition string (F1,F2,F3,F4+&amp;EB+R+F1,F2,F3,F4). The console printout of the R service is shown below:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">executing</span> <span class="n">engine</span> <span class="p">...</span>
+<span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>
+<span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>
+<span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>
+<span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span>     <span class="n">A</span> <span class="n">warm</span> <span class="n">greetings</span> <span class="n">from</span> <span class="n">CLARA</span> <span class="p">..........</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Hands On</a><ul>
+<li><a class="reference internal" href="#starting-a-dpe">Starting a DPE</a></li>
+<li><a class="reference internal" href="#starting-a-service">Starting a service</a></li>
+<li><a class="reference internal" href="#running-discover-service-example">Running discover service example</a></li>
+<li><a class="reference internal" href="#hello-world-application">Hello world application</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">Code Examples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="publications.html"
+                        title="next chapter">Clara related publications</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/handson.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="publications.html" title="Clara related publications"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Code Examples"
+             >previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, V. Gyurjyan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

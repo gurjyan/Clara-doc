@@ -1,0 +1,7 @@
+org.jlab.clara.base
+org.jlab.clara.engine
+org.jlab.clara.examples.engines
+org.jlab.clara.examples.orchestrators
+org.jlab.clara.sys
+org.jlab.clara.test
+org.jlab.clara.util

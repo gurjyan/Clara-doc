@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Service Threading &mdash; clara-zmq 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="clara-zmq 0.1 documentation" href="index.html" />
+    <link rel="next" title="Code Examples" href="examples.html" />
+    <link rel="prev" title="User engine" href="engine.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Code Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="engine.html" title="User engine"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="service-threading">
+<h1>Service Threading<a class="headerlink" href="#service-threading" title="Permalink to this headline">¶</a></h1>
+<p>Currently multi-core processors are the trend in hardware design. To satisfy ever-growing demand for computing power the obvious choice was to increase processor clock speed. The situation based on this choice did however end a few years back, and in the last couple of years clock speeds were stabilized at around 2 to 3 GHz. The main reason for that is the power, which increases non-linearly with the clock frequency, making processor cooling quit challenging. So, a new approach was adapted to improve performance by increasing number of processing cores per chip. So far this approach keeps hardware evolution with the Moore’s law, i.e. the number of cores per chip is doubled every 18-24 months. The process of hardware parallelization, being it multi-core or multiprocessor systems, will continue evolution in foreseeable future.</p>
+<p>Data processing parallelizeation is an essential design choice for Big data handling. However, software industry is lagging behind the hardware evolution. Some of the high level programming languages are not supporting or offering very coarse multi-threading implementations. Multi-threading in general is difficult to program and scale. The main source of the difficulty is the shared resource handling between threads. CLARA approach is to minimize resource dependencies between services, that makes multi-threading and scaling straight forward.  CLARA design solution is to pass information as a message rather than share states and resources. In another words CLARA service container is thread-native, where almost all resources are private.  This makes scaling of an application trivial (more instances of threads running copies of services). The only unknown is the user engine, that is going to be used in the service multi-threaded environment. Hence, the thread safety of the service-engine is the critical requirement. We hope that by minimizing mutex locks, context switching, synchronization, etc., CLARA services can run at a full native speed and make full use of a core. ZeroMQ library (used in xMsg) being single threaded perfectly fits into the CLARA architecture.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="_images/Slide07.jpg"><img alt="alternate text" src="_images/Slide07.jpg" style="width: 600px; height: 400px;" /></a>
+<p class="caption">Figure 14. Clara Service multi-threading</p>
+</div>
+<p>In this particular implementation, depicted in the Figure 14, the only resource that requires synchronization is the object pool of the <em>service</em> engine and <em>engine</em> object in the <em>service-engine</em>. Everything else is private to the service-engine object, including zeroMQ socket connections, their persistency, composition analyses and auto-routing, etc. Service  will create object pool with the defined pool size, yet object pool will grow in case of number of <em>simultaneous</em> requests are larger than the number of available objects in the pool. We define <em>simultaneous</em> requests as requests having arrival time difference smaller than the service engine execution time.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="engine.html"
+                        title="previous chapter">User engine</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Code Examples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/threading.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Code Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="engine.html" title="User engine"
+             >previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, V. Gyurjyan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

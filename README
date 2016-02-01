@@ -1,0 +1,19 @@
+Clara sphinx documentation.
+Under construction...
+
+
+sphinx installation:
+Following packages were used to generate ClaraWeb documentation
+On Mac:
+
+http://www.tug.org/mactex/index.html : latex/pdf support
+
+http://sphinx-doc.org : sphinx document building package
+install:
+sudo easy_install sphinx
+
+To build documentation:
+> cd ClaraWeb
+> make html
+or
+> make latexpdf

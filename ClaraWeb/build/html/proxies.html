@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CLARA proxy &mdash; clara-zmq 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="clara-zmq 0.1 documentation" href="index.html" />
+    <link rel="next" title="User engine" href="engine.html" />
+    <link rel="prev" title="Framework" href="framework.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="engine.html" title="User engine"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="framework.html" title="Framework"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="clara-proxy">
+<h1>CLARA proxy<a class="headerlink" href="#clara-proxy" title="Permalink to this headline">¶</a></h1>
+<p>CLARA application can be distributed, spanning across multiple nodes (DPE&#8217;s) over the network, accessing services and service compositions. The bigest problem in distributed systems is the discovery process. That is, how do services know about each other? The fact that services can come and go dynamically while the application is running makes the &#8220;dynamic discovery&#8221; process much more difficult. To solve this problem xMsg introduces a proxies with a defined TCP port. The xMsg proxy functions like a simple stateless message switch, much like http proxy, forwarding network packets between ports. xMsg proxy can run as a separate process or within a DPE.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="_images/Slide13.jpg"><img alt="alternate text" src="_images/Slide13.jpg" style="width: 600px; height: 400px;" /></a>
+<p class="caption">Figure13. CLARA proxy with the registration and discovery service.</p>
+</div>
+<p id="external-proxy">TCP <em>port = 7771</em> is used by CLARA application orchestrator/s, as well as exception and data monitors, to send request and subscribe messages. Examples of CLARA platform requests are</p>
+<blockquote>
+<div><ul class="simple">
+<li>service requests</li>
+<li>service container start/stop requests</li>
+<li>service deployment requests, etc.</li>
+</ul>
+</div></blockquote>
+<p>Asynchronous nature of CLARA communications requires requester to listen a response messages with consequent execution of a callback action. Since CLARA communications are based on publish-subscribe communication paradigm the above described communication mechanism in a pub-sub language will be described as</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>orchestrator/s and/or service/s publish/send request to the <em>port = 7771</em> and</li>
+<li>subscribe the future response messages at the <em>port = 7772</em>.</li>
+</ol>
+</div></blockquote>
+<p>CLARA proxy forwards requests from port <em>7771</em> to port <em>7772</em> where future service containers will subscribe orchestrator and/or monitor messages. Note that in this network pattern we can have  arbitrary number of containers and services.</p>
+<p>By introducing the proxy in each DPE, CLARA avoids s star network configuration (single point of failure architecture). The <em>7771</em> port is the port where services and/or orchestrator/s publish/send a data directly addressed to a service, deployed and running on a specific DPE. The <em>port 7772</em> is the port where services subscribe CLARA transient data envelopes. DPE proxy is the main hub to organize service based application data transfer.</p>
+<p>It is important to mention that CLARA TCP port assignments suggest a possible network security mechanism where only ports 7771 and 7772 will be exposed to the outside of a possible firewall. Also, in case only a few nodes are allowed to be outside of the firewall, a special gateway service is provided that is capable of accepting requests and forwarding them to a specific DPE running on a host behind the firewall.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="framework.html"
+                        title="previous chapter">Framework</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="engine.html"
+                        title="next chapter">User engine</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/proxies.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="engine.html" title="User engine"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="framework.html" title="Framework"
+             >previous</a> |</li>
+        <li><a href="index.html">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, V. Gyurjyan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

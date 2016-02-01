@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to CLARA &mdash; clara-zmq 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="clara-zmq 0.1 documentation" href="#" />
+    <link rel="next" title="Background and Motivation" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="intro.html" title="Background and Motivation"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-clara">
+<h1>Welcome to CLARA<a class="headerlink" href="#welcome-to-clara" title="Permalink to this headline">¶</a></h1>
+<div class="sidebar">
+<p class="first sidebar-title"><span class="blue2">Data Processing Framework</span></p>
+<p><img alt="clara" src="_images/clara.png" /></p>
+<p class="last"><span class="red">CLA</span>s12 <span class="red">R</span>econstruction and <span class="red">A</span>nalytics.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Background and Motivation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#data-processing-performance">Data Processing Performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#data-processing-application-design">Data Processing Application Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#programming-paradigm">Programming paradigm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#services-and-service-interactions">Services and service interactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#design-architecture">Design architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#basic-components">Basic components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#service-engine">Service engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#service-container">Service container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#dpe-anatomy">DPE anatomy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#cloud-formation">Cloud formation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#transient-data-envelope">Transient data envelope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#service-registration-and-discovery">Service registration and discovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#more-on-services">More on services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#clara-naming-convention">CLARA naming convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#application-composition">Application composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#more-on-application-programming">More on application programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#service-communication-monitoring">Service communication monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#exception-propagation-and-reporting">Exception propagation and reporting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="proxies.html">CLARA proxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">User engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="engine.html#software-as-a-clara-service">Software as a CLARA service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engine.html#engine-class-example">Engine class example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">Service Threading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#discover-a-service">Discover a service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#simple-application-design">Simple application design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#sentence-builder">Sentence builder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="handson.html">Hands On</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="handson.html#starting-a-dpe">Starting a DPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handson.html#starting-a-service">Starting a service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handson.html#running-discover-service-example">Running discover service example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handson.html#hello-world-application">Hello world application</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Clara related publications</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Next topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="next chapter">Background and Motivation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="intro.html" title="Background and Motivation"
+             >next</a> |</li>
+        <li><a href="#">clara-zmq 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, V. Gyurjyan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

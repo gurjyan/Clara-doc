@@ -1,0 +1,7 @@
+org.jlab.coda.xmsg.core
+org.jlab.coda.xmsg.data
+org.jlab.coda.xmsg.examples
+org.jlab.coda.xmsg.excp
+org.jlab.coda.xmsg.net
+org.jlab.coda.xmsg.xsys
+org.jlab.coda.xmsg.xsys.regdis
